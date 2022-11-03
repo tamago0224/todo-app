@@ -14,7 +14,7 @@ import (
 )
 
 func openDB() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "./todo.db")
+	db, err := sql.Open("sqlite3", "/var/rest-app/todo.db")
 	if err != nil {
 		return nil, err
 	}
