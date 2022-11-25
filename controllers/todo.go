@@ -34,6 +34,7 @@ func GetTodoList(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	defer db.Close()
 
 	rows, err := db.Query("SELECT * FROM todos")
 	if err != nil {
@@ -76,6 +77,7 @@ func AddTodo(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	defer db.Close()
 
 	// write todo to database.
 	result, err := db.Exec("INSERT INTO todos (title, description) VALUES (?, ?)", todo.Title, todo.Description)
@@ -123,6 +125,7 @@ func GetTodo(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	defer db.Close()
 
 	var id int64
 	var title string
@@ -152,6 +155,7 @@ func DeleteTodo(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	defer db.Close()
 
 	result, err := db.Exec("DELETE FROM todos WHERE id = ?", todoId)
 	if err != nil {
