@@ -34,9 +34,3 @@ jobs:
               with:
                   push: true
                   tags: tamago0224/rest-app:${{ steps.prepare_build_arg.outputs.CURRENT_TAG }}
-                  cache-from: type=local,src=/tmp/.buildx-cache
-                  cache-to: type=local,src=/tmp/.buildx-cache-new
-            - name: update cache
-              run: |
-                  rm -rf /tmp/.buildx-cache
-                  mv /tmp/.buildx-cache-new /tmp/.buildx-cache
