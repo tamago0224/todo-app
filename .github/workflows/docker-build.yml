@@ -1,0 +1,42 @@
+# refer: https://zenn.dev/taka0125/articles/1448c21a0ca66e
+name: docker-build
+on:
+    push:
+        tags:
+            - "v*"
+jobs:
+    docker:
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout
+              uses: actions/checkout@v2
+            - name: set up docker builx
+              uses: docker/setup-buildx-actions@v1
+            - name: cache docker layers
+              uses: actions/cache@v2
+              with:
+                  path: /tmp/.buildx-cache
+                  key: ${{ runner.os }}-buildx-${{ github.sha }}
+                  restore-keys: |
+                      ${{ runner.os }}-buildx-
+            - name: prepare build args
+              id: prepare_build_arg
+              run: |
+                  CURRENT_TAG=${GITHUB_REF#refs/tags/}
+                  echo ::set-output name=CURRENT_TAG::${CURRENT_TAG}
+            - name: login to dockerhub
+              uses: docker/login-action@v1
+              with:
+                  username: ${{ secret.DOCKERHUB_USERNAME }}
+                  password: ${{ secret.DOCKERHUB_TOKEN }}
+            - name: build and push docker image to dockerhub
+              uses: docker/build-push-action@v2
+              with:
+                  push: true
+                  tags: tamago0224/rest-app:${{ steps.prepare_build_arg.outputs.CURRENT_TAG }}
+                  cache-from: type=local,src=/tmp/.buildx-cache
+                  cache-to: type=local,src=/tmp/.buildx-cache-new
+            - name: update cache
+              run: |
+                  rm -rf /tmp/.buildx-cache
+                  mv /tmp/.buildx-cache-new /tmp/.buildx-cache
