@@ -10,7 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/tamago0224/golang-rest-api/models"
+	"github.com/tamago0224/rest-app-backend/models"
 )
 
 func openDB() (*sql.DB, error) {

@@ -1,4 +1,4 @@
-module github.com/tamago0224/golang-rest-api
+module github.com/tamago0224/rest-app-backend
 
 go 1.16
 

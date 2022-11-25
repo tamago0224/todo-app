@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/tamago0224/golang-rest-api/controllers"
+	"github.com/tamago0224/rest-app-backend/controllers"
 )
 
 func main() {
