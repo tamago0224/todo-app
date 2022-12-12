@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/tamago0224/rest-app-backend/controllers"
 	"github.com/tamago0224/rest-app-backend/repository"
 
@@ -21,6 +22,8 @@ func main() {
 	todoRepository := repository.NewTodoMariaDBRepository(db)
 	todoController := controllers.NewTodoController(todoRepository)
 	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 	e.GET("/todos", todoController.GetTodoList)
 	e.POST("/todos", todoController.AddTodo)
 	e.GET("/todos/:id", todoController.GetTodo)
