@@ -2,13 +2,10 @@ package controllers
 
 import (
 	"database/sql"
-	"encoding/json"
-	"io"
 	"log"
 	"net/http"
-	"strconv"
 
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/tamago0224/rest-app-backend/models"
 )
@@ -27,20 +24,18 @@ func openDB() (*sql.DB, error) {
 	return db, err
 }
 
-func GetTodoList(rw http.ResponseWriter, r *http.Request) {
+func GetTodoList(c echo.Context) error {
 	db, err := openDB()
 	if err != nil {
 		log.Print(err)
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT * FROM todos")
 	if err != nil {
 		log.Print(err)
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
 	var todos []models.Todo
@@ -51,31 +46,25 @@ func GetTodoList(rw http.ResponseWriter, r *http.Request) {
 		err = rows.Scan(&id, &title, &description)
 		if err != nil {
 			log.Print(err)
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
+			return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 		}
 		todos = append(todos, models.Todo{Id: id, Title: title, Description: description})
 	}
 
-	rw.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(rw).Encode(todos)
+	return c.JSON(http.StatusOK, todos)
 }
 
-func AddTodo(rw http.ResponseWriter, r *http.Request) {
-
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(rw, err.Error(), http.StatusBadRequest)
-		return
-	}
+func AddTodo(c echo.Context) error {
 	var todo models.Todo
-	json.Unmarshal(body, &todo)
+	err := c.Bind(&todo)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "invalid todo body")
+	}
 
 	db, err := openDB()
 	if err != nil {
 		log.Print(err)
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 	defer db.Close()
 
@@ -83,47 +72,38 @@ func AddTodo(rw http.ResponseWriter, r *http.Request) {
 	result, err := db.Exec("INSERT INTO todos (title, description) VALUES (?, ?)", todo.Title, todo.Description)
 	if err != nil {
 		log.Print(err)
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
 	rows, err := result.RowsAffected()
 	if err != nil {
 		log.Print(err)
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
 	if rows != 1 {
 		log.Printf("expected to affect 1 row, affected %d", rows)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
 		log.Print(err)
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
 	todo.Id = id
 
-	json.NewEncoder(rw).Encode(todo)
+	return c.JSON(http.StatusCreated, todo)
 }
 
-func GetTodo(rw http.ResponseWriter, r *http.Request) {
-	todoId, err := strconv.Atoi(mux.Vars(r)["id"])
-	if err != nil {
-		log.Print(err)
-		rw.WriteHeader(http.StatusBadRequest)
-		return
-	}
+func GetTodo(c echo.Context) error {
+	todoId := c.Param("id")
 
 	db, err := openDB()
 	if err != nil {
 		log.Print(err)
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 	defer db.Close()
 
@@ -133,47 +113,38 @@ func GetTodo(rw http.ResponseWriter, r *http.Request) {
 	err = db.QueryRow("SELECT * FROM todos WHERE id = ?", todoId).Scan(&id, &title, &description)
 	if err != nil {
 		log.Print(err)
-		rw.WriteHeader(http.StatusNotFound)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	rw.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(rw).Encode(models.Todo{Id: id, Title: title, Description: description})
+	return c.JSON(http.StatusOK, models.Todo{Id: id, Title: title, Description: description})
 }
 
-func DeleteTodo(rw http.ResponseWriter, r *http.Request) {
-	todoId, err := strconv.Atoi(mux.Vars(r)["id"])
-	if err != nil {
-		log.Print(err)
-		rw.WriteHeader(http.StatusBadRequest)
-		return
-	}
+func DeleteTodo(c echo.Context) error {
+	todoId := c.Param("id")
 
 	db, err := openDB()
 	if err != nil {
 		log.Print(err)
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 	defer db.Close()
 
 	result, err := db.Exec("DELETE FROM todos WHERE id = ?", todoId)
 	if err != nil {
 		log.Print(err)
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
 	rows, err := result.RowsAffected()
 	if err != nil {
 		log.Print(err)
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
 	if rows != 1 {
 		log.Printf("expected to affect 1 row, affected %d", rows)
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	rw.WriteHeader(http.StatusNoContent)
+	return c.JSON(http.StatusNoContent, nil)
 }

@@ -1,18 +1,16 @@
 package main
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo/v4"
 	"github.com/tamago0224/rest-app-backend/controllers"
 )
 
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/todos", controllers.GetTodoList).Methods(http.MethodGet)
-	r.HandleFunc("/todos", controllers.AddTodo).Methods(http.MethodPost)
-	r.HandleFunc("/todos/{id:[0-9]+}", controllers.GetTodo).Methods(http.MethodGet)
-	r.HandleFunc("/todos/{id:[0-9]+}", controllers.DeleteTodo).Methods(http.MethodDelete)
+	e := echo.New()
+	e.GET("/todos", controllers.GetTodo)
+	e.POST("/todos", controllers.AddTodo)
+	e.GET("/todos/:id", controllers.GetTodo)
+	e.POST("/todos/:id", controllers.DeleteTodo)
 
-	http.ListenAndServe(":8080", r)
+	e.Logger.Fatal(e.Start(":8080"))
 }
