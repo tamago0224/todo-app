@@ -27,13 +27,14 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.GET("/todos", todoController.GetTodoList)
-	e.POST("/todos", todoController.AddTodo)
-	e.GET("/todos/:id", todoController.GetTodo)
-	e.DELETE("/todos/:id", todoController.DeleteTodo)
+	apiGroup := e.Group("/api/v1")
+	apiGroup.GET("/todos", todoController.GetTodoList)
+	apiGroup.POST("/todos", todoController.AddTodo)
+	apiGroup.GET("/todos/:id", todoController.GetTodo)
+	apiGroup.DELETE("/todos/:id", todoController.DeleteTodo)
 
-	e.GET("/users", userController.SearchUser)
-	e.POST("/users", userController.CreateUser)
+	apiGroup.GET("/users", userController.SearchUser)
+	apiGroup.POST("/users", userController.CreateUser)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
