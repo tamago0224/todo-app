@@ -23,11 +23,16 @@ func main() {
 	todoController := controllers.NewTodoController(todoRepository)
 	userRepository := repository.NewUserMariaDBRepository(db)
 	userController := controllers.NewUserController(userRepository)
+	authController := controllers.NewAuthController(userRepository)
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	e.POST("/login", authController.Login)
 	apiGroup := e.Group("/api/v1")
+	apiGroup.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: []byte("secret"),
+	}))
 	apiGroup.GET("/todos", todoController.GetTodoList)
 	apiGroup.POST("/todos", todoController.AddTodo)
 	apiGroup.GET("/todos/:id", todoController.GetTodo)
