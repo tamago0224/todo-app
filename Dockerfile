@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY . /app
 
-RUN go mod tidy && go build -o rest-app . 
+RUN go mod tidy
+RUN go build -o rest-app . 
 
 FROM golang:1.19.3 as runner
 

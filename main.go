@@ -21,13 +21,19 @@ func main() {
 
 	todoRepository := repository.NewTodoMariaDBRepository(db)
 	todoController := controllers.NewTodoController(todoRepository)
+	userRepository := repository.NewUserMariaDBRepository(db)
+	userController := controllers.NewUserController(userRepository)
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+
 	e.GET("/todos", todoController.GetTodoList)
 	e.POST("/todos", todoController.AddTodo)
 	e.GET("/todos/:id", todoController.GetTodo)
 	e.DELETE("/todos/:id", todoController.DeleteTodo)
+
+	e.GET("/users", userController.SearchUser)
+	e.POST("/users", userController.CreateUser)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
