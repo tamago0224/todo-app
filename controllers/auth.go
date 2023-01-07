@@ -50,6 +50,6 @@ func (ac *AuthController) Login(c echo.Context) error {
 		return InternalServerError(err)
 	}
 
-	c.SetCookie(&http.Cookie{Name: "auth_token", Value: t, HttpOnly: true})
+	c.SetCookie(&http.Cookie{Name: "auth_token", Value: t, HttpOnly: true, Secure: true})
 	return c.JSON(http.StatusOK, nil)
 }
