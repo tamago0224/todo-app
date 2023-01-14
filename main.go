@@ -35,7 +35,8 @@ func main() {
 	e.POST("/login", authController.Login)
 	apiGroup := e.Group("/api/v1")
 	apiGroup.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-		SigningKey: []byte("secret"),
+		SigningKey:  []byte("secret"),
+		TokenLookup: "cookie:auth_token",
 	}))
 	apiGroup.GET("/todos", todoController.GetTodoList)
 	apiGroup.POST("/todos", todoController.AddTodo)
