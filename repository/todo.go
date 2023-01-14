@@ -5,7 +5,7 @@ import (
 )
 
 type TodoRepository interface {
-	GetAllTodo() ([]models.Todo, error)
+	GetAllTodo(userId int64) ([]models.Todo, error)
 	GetTodo(models.Todo) (models.Todo, error)
 	AddTodo(models.Todo) (models.Todo, error)
 	DeleteTodo(models.Todo) (models.Todo, error)

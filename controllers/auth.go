@@ -10,8 +10,9 @@ import (
 	"github.com/tamago0224/rest-app-backend/repository"
 )
 
-type jwtCustomClaims struct {
+type JwtCustomClaims struct {
 	Name string `json:"name"`
+	Id   int64  `json:"id"`
 	jwt.StandardClaims
 }
 
@@ -40,7 +41,7 @@ func (ac *AuthController) Login(c echo.Context) error {
 	}
 
 	// ユーザ名、パスワードが一致したらJWTトークンを生成する
-	claims := &jwtCustomClaims{Name: u.Name, StandardClaims: jwt.StandardClaims{
+	claims := &JwtCustomClaims{Name: u.Name, Id: u.Id, StandardClaims: jwt.StandardClaims{
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 	}}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

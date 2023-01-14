@@ -20,7 +20,8 @@ func NewTodoController(todoRepo repository.TodoRepository) *TodoController {
 }
 
 func (tc *TodoController) GetTodoList(c echo.Context) error {
-	todos, err := tc.todoRepo.GetAllTodo()
+	userId := LoginUserId(c)
+	todos, err := tc.todoRepo.GetAllTodo(userId)
 	if err != nil {
 		log.Print(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
@@ -30,6 +31,7 @@ func (tc *TodoController) GetTodoList(c echo.Context) error {
 }
 
 func (tc *TodoController) GetTodo(c echo.Context) error {
+	userId := LoginUserId(c)
 	todoId := c.Param("id")
 	id, err := strconv.Atoi(todoId)
 	if err != nil {
@@ -37,7 +39,7 @@ func (tc *TodoController) GetTodo(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	todo, err := tc.todoRepo.GetTodo(models.Todo{Id: int64(id)})
+	todo, err := tc.todoRepo.GetTodo(models.Todo{Id: int64(id), UserId: userId})
 	if err != nil {
 		log.Print(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
@@ -47,12 +49,15 @@ func (tc *TodoController) GetTodo(c echo.Context) error {
 }
 
 func (tc *TodoController) AddTodo(c echo.Context) error {
+	userId := LoginUserId(c)
 	var todo models.Todo
+
 	err := c.Bind(&todo)
 	if err != nil {
 		return c.String(http.StatusBadRequest, "invalid todo body")
 	}
-
+	// ログインユーザのIDを追加する
+	todo.UserId = userId
 	addTodo, err := tc.todoRepo.AddTodo(todo)
 	if err != nil {
 		log.Print(err)
@@ -63,6 +68,7 @@ func (tc *TodoController) AddTodo(c echo.Context) error {
 }
 
 func (tc *TodoController) DeleteTodo(c echo.Context) error {
+	userId := LoginUserId(c)
 	todoId := c.Param("id")
 	id, err := strconv.Atoi(todoId)
 	if err != nil {
@@ -70,7 +76,7 @@ func (tc *TodoController) DeleteTodo(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	todo, err := tc.todoRepo.DeleteTodo(models.Todo{Id: int64(id)})
+	todo, err := tc.todoRepo.DeleteTodo(models.Todo{Id: int64(id), UserId: userId})
 	if err != nil {
 		log.Print(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")

@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/golang-jwt/jwt/v4"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/tamago0224/rest-app-backend/controllers"
@@ -34,7 +36,10 @@ func main() {
 
 	e.POST("/login", authController.Login)
 	apiGroup := e.Group("/api/v1")
-	apiGroup.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+	apiGroup.Use(echojwt.WithConfig(echojwt.Config{
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return new(controllers.JwtCustomClaims)
+		},
 		SigningKey:  []byte("secret"),
 		TokenLookup: "cookie:auth_token",
 	}))
