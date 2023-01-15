@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -46,6 +47,33 @@ func (ac *AuthController) Login(c echo.Context) error {
 	}}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
+	t, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		return InternalServerError(err)
+	}
+
+	c.SetCookie(&http.Cookie{Name: "auth_token", Value: t, HttpOnly: true, Secure: true})
+	return c.JSON(http.StatusOK, nil)
+}
+
+func (ac *AuthController) RegistUser(c echo.Context) error {
+	var user models.User
+	err := c.Bind(&user)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid body")
+	}
+
+	// ユーザを登録する
+	u, err := ac.userRepo.CreateUser(user)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("user already exist. %s", user.Name))
+	}
+
+	// ユーザの作成に成功すればログイな使いにするのでCookieをセットする
+	claims := &JwtCustomClaims{Name: u.Name, Id: u.Id, StandardClaims: jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+	}}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	t, err := token.SignedString([]byte("secret"))
 	if err != nil {
 		return InternalServerError(err)

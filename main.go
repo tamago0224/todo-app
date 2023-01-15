@@ -35,6 +35,7 @@ func main() {
 	}))
 
 	e.POST("/login", authController.Login)
+	e.POST("/register", authController.RegistUser)
 	apiGroup := e.Group("/api/v1")
 	apiGroup.Use(echojwt.WithConfig(echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
