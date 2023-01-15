@@ -35,10 +35,10 @@ func (ac *AuthController) Login(c echo.Context) error {
 	// nameをキーにDBからユーザ名を取得し、パスワードが一致することをチェックする
 	u, err := ac.userRepo.SearchUser(user.Name)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, "user anauthorized")
+		return echo.NewHTTPError(http.StatusUnauthorized, "user unauthorized")
 	}
 	if user.Password != u.Password {
-		return echo.NewHTTPError(http.StatusUnauthorized, "user anauthorized")
+		return echo.NewHTTPError(http.StatusUnauthorized, "user unauthorized")
 	}
 
 	// ユーザ名、パスワードが一致したらJWTトークンを生成する
