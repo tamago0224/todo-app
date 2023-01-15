@@ -20,7 +20,7 @@ func (t *TodoMariaDB) GetAllTodo(userId int64) ([]models.Todo, error) {
 		return nil, err
 	}
 
-	var todos []models.Todo
+	todos := []models.Todo{}
 	for rows.Next() {
 		var id int64
 		var userId int64
