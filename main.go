@@ -24,7 +24,6 @@ func main() {
 	todoRepository := repository.NewTodoMariaDBRepository(db)
 	todoController := controllers.NewTodoController(todoRepository)
 	userRepository := repository.NewUserMariaDBRepository(db)
-	userController := controllers.NewUserController(userRepository)
 	authController := controllers.NewAuthController(userRepository)
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -48,9 +47,6 @@ func main() {
 	apiGroup.POST("/todos", todoController.AddTodo)
 	apiGroup.GET("/todos/:id", todoController.GetTodo)
 	apiGroup.DELETE("/todos/:id", todoController.DeleteTodo)
-
-	apiGroup.GET("/users", userController.SearchUser)
-	apiGroup.POST("/users", userController.CreateUser)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
