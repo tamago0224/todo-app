@@ -1,0 +1,105 @@
+openapi: 3.0.3
+info:
+    title: Todo Application Backend API
+    description: TODOアプリのバックエンド
+    license:
+        name: Apache 2.0
+        url: http://www.apache.org/licenses/LICENSE-2.0.html
+    version: 1.0.0
+servers:
+    - url: "http://localhost:8080/api/v1"
+      description: 開発用の手元環境
+paths:
+    /todos:
+        get:
+            description: "ユーザのTODO一覧を取得"
+            operationId: showTodos
+            responses:
+                "200":
+                    description: 取得成功時
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Todos"
+        post:
+            description: "TODOの作成"
+            operationId: addTodo
+            responses:
+                "201":
+                    description: 作成成功
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Todo"
+    /todos/{todo_id}:
+        get:
+            description: "指定したTODOの詳細を取得"
+            operationId: showTodoDetail
+            parameters:
+                - $ref: "#/components/parameters/PathTodoId"
+            responses:
+                "200":
+                    description: 取得成功時
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Todo"
+        delete:
+            description: "指定したTODOを削除する"
+            operationId: deleteTodo
+            parameters:
+                - $ref: "#/components/parameters/PathTodoId"
+            responses:
+                "204":
+                    description: 削除成功
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Todo"
+components:
+    parameters:
+        PathTodoId:
+            name: todo_id
+            in: path
+            required: true
+            schema:
+                type: integer
+    schemas:
+        Todo:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                userId:
+                    type: integer
+                    format: int64
+                title:
+                    type: string
+                description:
+                    type: string
+            example:
+                id: 1
+                userId: 2
+                title: サンプルTODO
+                description: サンプル用のTODO
+        Todos:
+            type: array
+            items:
+                $ref: "#/components/schemas/Todo"
+            example:
+                - id: 1
+                  userId: 2
+                  title: サンプルTODO
+                  description: サンプル用のTODOその1
+                - id: 2
+                  userId: 2
+                  title: 明日野菜を買う
+    securitySchemes:
+        ApiKeyAuth:
+            type: apiKey
+            in: cookie
+            name: auth_token
+            description: /api/v1へのセキュリティ制限
+security:
+    - ApiKeyAuth: []
