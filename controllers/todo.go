@@ -7,7 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/tamago0224/rest-app-backend/models"
+	"github.com/tamago0224/rest-app-backend/model"
 	"github.com/tamago0224/rest-app-backend/repository"
 )
 
@@ -39,7 +39,7 @@ func (tc *TodoController) GetTodo(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	todo, err := tc.todoRepo.GetTodo(models.Todo{Id: int64(id), UserId: userId})
+	todo, err := tc.todoRepo.GetTodo(model.Todo{Id: int64(id), UserId: userId})
 	if err != nil {
 		log.Print(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
@@ -50,7 +50,7 @@ func (tc *TodoController) GetTodo(c echo.Context) error {
 
 func (tc *TodoController) AddTodo(c echo.Context) error {
 	userId := LoginUserId(c)
-	var todo models.Todo
+	var todo model.Todo
 
 	err := c.Bind(&todo)
 	if err != nil {
@@ -76,7 +76,7 @@ func (tc *TodoController) DeleteTodo(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	todo, err := tc.todoRepo.DeleteTodo(models.Todo{Id: int64(id), UserId: userId})
+	todo, err := tc.todoRepo.DeleteTodo(model.Todo{Id: int64(id), UserId: userId})
 	if err != nil {
 		log.Print(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")

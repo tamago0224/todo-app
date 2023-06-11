@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
-	"github.com/tamago0224/rest-app-backend/models"
+	"github.com/tamago0224/rest-app-backend/model"
 	"github.com/tamago0224/rest-app-backend/repository"
 )
 
@@ -26,7 +26,7 @@ func NewAuthController(userRepo repository.UserRepository) AuthController {
 }
 
 func (ac *AuthController) Login(c echo.Context) error {
-	var user models.User
+	var user model.User
 	err := c.Bind(&user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid body")
@@ -57,7 +57,7 @@ func (ac *AuthController) Login(c echo.Context) error {
 }
 
 func (ac *AuthController) RegistUser(c echo.Context) error {
-	var user models.User
+	var user model.User
 	err := c.Bind(&user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid body")

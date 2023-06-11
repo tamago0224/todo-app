@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/tamago0224/rest-app-backend/models"
+	"github.com/tamago0224/rest-app-backend/model"
 	"github.com/tamago0224/rest-app-backend/repository"
 )
 
@@ -33,7 +33,7 @@ func (uc *UserController) SearchUser(c echo.Context) error {
 }
 
 func (uc *UserController) CreateUser(c echo.Context) error {
-	var user models.User
+	var user model.User
 	err := c.Bind(&user)
 	if err != nil {
 		return InternalServerError(err)
