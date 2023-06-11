@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
-	"github.com/tamago0224/rest-app-backend/model"
-	"github.com/tamago0224/rest-app-backend/repository"
+	"github.com/tamago0224/rest-app-backend/data/model"
+	"github.com/tamago0224/rest-app-backend/data/repository"
 )
 
 type JwtCustomClaims struct {

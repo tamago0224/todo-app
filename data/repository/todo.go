@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/tamago0224/rest-app-backend/model"
+	"github.com/tamago0224/rest-app-backend/data/model"
 )
 
 type TodoRepository interface {

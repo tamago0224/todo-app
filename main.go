@@ -8,7 +8,7 @@ import (
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/tamago0224/rest-app-backend/controllers"
+	"github.com/tamago0224/rest-app-backend/controller"
 	"github.com/tamago0224/rest-app-backend/repository"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -22,9 +22,9 @@ func main() {
 	defer db.Close()
 
 	todoRepository := repository.NewTodoMariaDBRepository(db)
-	todoController := controllers.NewTodoController(todoRepository)
+	todoController := controller.NewTodoController(todoRepository)
 	userRepository := repository.NewUserMariaDBRepository(db)
-	authController := controllers.NewAuthController(userRepository)
+	authController := controller.NewAuthController(userRepository)
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -38,7 +38,7 @@ func main() {
 	apiGroup := e.Group("/api/v1")
 	apiGroup.Use(echojwt.WithConfig(echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(controllers.JwtCustomClaims)
+			return new(controller.JwtCustomClaims)
 		},
 		SigningKey:  []byte("secret"),
 		TokenLookup: "cookie:auth_token",

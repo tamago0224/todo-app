@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 
-	"github.com/tamago0224/rest-app-backend/model"
+	"github.com/tamago0224/rest-app-backend/data/model"
 )
 
 type TodoMariaDB struct {
