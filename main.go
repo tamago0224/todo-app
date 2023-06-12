@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/tamago0224/rest-app-backend/controller"
-	"github.com/tamago0224/rest-app-backend/repository"
+	"github.com/tamago0224/rest-app-backend/data/repository"
 
 	_ "github.com/go-sql-driver/mysql"
 )

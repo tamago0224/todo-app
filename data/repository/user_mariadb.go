@@ -15,11 +15,23 @@ func NewUserMariaDBRepository(db *sql.DB) UserRepository {
 	return &UserMariaDB{db: db}
 }
 
-func (u *UserMariaDB) SearchUser(name string) (model.User, error) {
+func (u *UserMariaDB) SelectByName(name string) (model.User, error) {
 	var userId int64
 	var userName string
 	var userPassword string
 	err := u.db.QueryRow("SELECT * FROM users WHERE name = ?", name).Scan(&userId, &userName, &userPassword)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	return model.User{Id: userId, Name: userName, Password: userPassword}, nil
+}
+
+func (u *UserMariaDB) SelectByID(userID int) (model.User, error) {
+	var userId int64
+	var userName string
+	var userPassword string
+	err := u.db.QueryRow("SELECT * FROM users WHERE id = ?", userID).Scan(&userId, &userName, &userPassword)
 	if err != nil {
 		return model.User{}, err
 	}

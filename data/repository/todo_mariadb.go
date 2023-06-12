@@ -14,7 +14,7 @@ func NewTodoMariaDBRepository(db *sql.DB) TodoRepository {
 	return &TodoMariaDB{db: db}
 }
 
-func (t *TodoMariaDB) GetAllTodo(userId int64) ([]model.Todo, error) {
+func (t *TodoMariaDB) GetAllTodo(userId int) ([]model.Todo, error) {
 	rows, err := t.db.Query("SELECT * FROM todos where user_id = ?", userId)
 	if err != nil {
 		return nil, err
@@ -36,12 +36,12 @@ func (t *TodoMariaDB) GetAllTodo(userId int64) ([]model.Todo, error) {
 	return todos, nil
 }
 
-func (t *TodoMariaDB) GetTodo(todo model.Todo) (model.Todo, error) {
+func (t *TodoMariaDB) GetTodo(userID, todoID int) (model.Todo, error) {
 	var id int64
 	var userId int64
 	var title string
 	var description string
-	err := t.db.QueryRow("SELECT * FROM todos WHERE id = ? AND user_id = ?", todo.Id, todo.UserId).Scan(&id, &userId, &title, &description)
+	err := t.db.QueryRow("SELECT * FROM todos WHERE id = ? AND user_id = ?", todoID, userID).Scan(&id, &userId, &title, &description)
 	if err != nil {
 		return model.Todo{}, err
 	}

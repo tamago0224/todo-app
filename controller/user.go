@@ -21,7 +21,7 @@ func NewUserController(userRepo repository.UserRepository) *UserController {
 func (uc *UserController) SearchUser(c echo.Context) error {
 	name := c.QueryParam("name")
 
-	user, err := uc.userRepo.SearchUser(name)
+	user, err := uc.userRepo.SelectByName(name)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("user %s not found.", name))

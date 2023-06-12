@@ -33,7 +33,7 @@ func (ac *AuthController) Login(c echo.Context) error {
 	}
 
 	// nameをキーにDBからユーザ名を取得し、パスワードが一致することをチェックする
-	u, err := ac.userRepo.SearchUser(user.Name)
+	u, err := ac.userRepo.SelectByName(user.Name)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, "user unauthorized")
 	}

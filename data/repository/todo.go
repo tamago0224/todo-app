@@ -5,8 +5,8 @@ import (
 )
 
 type TodoRepository interface {
-	GetAllTodo(userId int64) ([]model.Todo, error)
-	GetTodo(model.Todo) (model.Todo, error)
+	GetAllTodo(userId int) ([]model.Todo, error)
+	GetTodo(userID, todoID int) (model.Todo, error)
 	AddTodo(model.Todo) (model.Todo, error)
 	DeleteTodo(model.Todo) (model.Todo, error)
 }

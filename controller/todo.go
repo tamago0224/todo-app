@@ -39,7 +39,7 @@ func (tc *TodoController) GetTodo(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	todo, err := tc.todoRepo.GetTodo(model.Todo{Id: int64(id), UserId: userId})
+	todo, err := tc.todoRepo.GetTodo(id, userId)
 	if err != nil {
 		log.Print(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
@@ -57,7 +57,7 @@ func (tc *TodoController) AddTodo(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "invalid todo body")
 	}
 	// ログインユーザのIDを追加する
-	todo.UserId = userId
+	todo.UserId = int64(userId)
 	addTodo, err := tc.todoRepo.AddTodo(todo)
 	if err != nil {
 		log.Print(err)
@@ -76,7 +76,7 @@ func (tc *TodoController) DeleteTodo(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	todo, err := tc.todoRepo.DeleteTodo(model.Todo{Id: int64(id), UserId: userId})
+	todo, err := tc.todoRepo.DeleteTodo(model.Todo{Id: int64(id), UserId: int64(userId)})
 	if err != nil {
 		log.Print(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
