@@ -7,8 +7,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/tamago0224/rest-app-backend/data/model"
-	"github.com/tamago0224/rest-app-backend/data/repository"
+	"github.com/tamago0224/rest-app-backend/domain/model"
+	"github.com/tamago0224/rest-app-backend/domain/repository"
 )
 
 type TodoController struct {

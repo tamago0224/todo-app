@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/tamago0224/rest-app-backend/data/model"
+	"github.com/tamago0224/rest-app-backend/domain/model"
 )
 
 type UserMariaDB struct {

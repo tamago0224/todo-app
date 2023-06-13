@@ -1,6 +1,6 @@
 package repository
 
-import "github.com/tamago0224/rest-app-backend/data/model"
+import "github.com/tamago0224/rest-app-backend/domain/model"
 
 type UserRepository interface {
 	SelectByName(name string) (model.User, error)
