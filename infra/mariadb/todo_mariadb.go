@@ -1,16 +1,17 @@
-package repository
+package mariadb
 
 import (
 	"database/sql"
 
 	"github.com/tamago0224/rest-app-backend/domain/model"
+	"github.com/tamago0224/rest-app-backend/domain/repository"
 )
 
 type TodoMariaDB struct {
 	db *sql.DB
 }
 
-func NewTodoMariaDBRepository(db *sql.DB) TodoRepository {
+func NewTodoMariaDBRepository(db *sql.DB) repository.TodoRepository {
 	return &TodoMariaDB{db: db}
 }
 

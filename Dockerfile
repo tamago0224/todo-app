@@ -7,7 +7,7 @@ COPY . /app
 RUN go mod tidy
 RUN go build -o rest-app . 
 
-FROM golang:1.19.3 as runner
+FROM golang:1.20.3 as runner
 
 WORKDIR /app
 COPY --from=builder /app/rest-app /app

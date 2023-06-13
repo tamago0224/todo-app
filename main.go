@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/tamago0224/rest-app-backend/controller"
-	"github.com/tamago0224/rest-app-backend/domain/repository"
+	"github.com/tamago0224/rest-app-backend/infra/mariadb"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -21,9 +21,9 @@ func main() {
 	}
 	defer db.Close()
 
-	todoRepository := repository.NewTodoMariaDBRepository(db)
+	todoRepository := mariadb.NewTodoMariaDBRepository(db)
 	todoController := controller.NewTodoController(todoRepository)
-	userRepository := repository.NewUserMariaDBRepository(db)
+	userRepository := mariadb.NewUserMariaDBRepository(db)
 	authController := controller.NewAuthController(userRepository)
 	e := echo.New()
 	e.Use(middleware.Logger())

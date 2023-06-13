@@ -1,17 +1,18 @@
-package repository
+package mariadb
 
 import (
 	"database/sql"
 	"fmt"
 
 	"github.com/tamago0224/rest-app-backend/domain/model"
+	"github.com/tamago0224/rest-app-backend/domain/repository"
 )
 
 type UserMariaDB struct {
 	db *sql.DB
 }
 
-func NewUserMariaDBRepository(db *sql.DB) UserRepository {
+func NewUserMariaDBRepository(db *sql.DB) repository.UserRepository {
 	return &UserMariaDB{db: db}
 }
 
