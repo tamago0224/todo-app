@@ -7,21 +7,21 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/tamago0224/rest-app-backend/domain/model"
-	"github.com/tamago0224/rest-app-backend/domain/repository"
+	"github.com/tamago0224/rest-app-backend/usecase"
 )
 
 type UserController struct {
-	userRepo repository.UserRepository
+	usecase usecase.IUserUsecase
 }
 
-func NewUserController(userRepo repository.UserRepository) *UserController {
-	return &UserController{userRepo: userRepo}
+func NewUserController(userUsecase usecase.IUserUsecase) *UserController {
+	return &UserController{usecase: userUsecase}
 }
 
 func (uc *UserController) SearchUser(c echo.Context) error {
 	name := c.QueryParam("name")
 
-	user, err := uc.userRepo.SelectByName(name)
+	user, err := uc.usecase.SearchUser(name)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("user %s not found.", name))
@@ -39,7 +39,7 @@ func (uc *UserController) CreateUser(c echo.Context) error {
 		return InternalServerError(err)
 	}
 
-	createdUser, err := uc.userRepo.CreateUser(user)
+	createdUser, err := uc.usecase.CreateUser(user)
 	if err != nil {
 		return InternalServerError(err)
 	}
