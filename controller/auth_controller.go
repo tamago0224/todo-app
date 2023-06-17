@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
-	"github.com/tamago0224/rest-app-backend/models"
-	"github.com/tamago0224/rest-app-backend/repository"
+	"github.com/tamago0224/rest-app-backend/domain/model"
+	"github.com/tamago0224/rest-app-backend/usecase"
 )
 
 type JwtCustomClaims struct {
@@ -18,22 +18,22 @@ type JwtCustomClaims struct {
 }
 
 type AuthController struct {
-	userRepo repository.UserRepository
+	usecase usecase.IUserUsecase
 }
 
-func NewAuthController(userRepo repository.UserRepository) AuthController {
-	return AuthController{userRepo: userRepo}
+func NewAuthController(userUsecase usecase.IUserUsecase) AuthController {
+	return AuthController{usecase: userUsecase}
 }
 
 func (ac *AuthController) Login(c echo.Context) error {
-	var user models.User
+	var user model.User
 	err := c.Bind(&user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid body")
 	}
 
 	// nameをキーにDBからユーザ名を取得し、パスワードが一致することをチェックする
-	u, err := ac.userRepo.SearchUser(user.Name)
+	u, err := ac.usecase.SearchUser(user.Name)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, "user unauthorized")
 	}
@@ -57,14 +57,14 @@ func (ac *AuthController) Login(c echo.Context) error {
 }
 
 func (ac *AuthController) RegistUser(c echo.Context) error {
-	var user models.User
+	var user model.User
 	err := c.Bind(&user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid body")
 	}
 
 	// ユーザを登録する
-	u, err := ac.userRepo.CreateUser(user)
+	u, err := ac.usecase.CreateUser(user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("user already exist. %s", user.Name))
 	}

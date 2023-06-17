@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"log"
@@ -13,10 +13,10 @@ func InternalServerError(err error) error {
 	return echo.NewHTTPError(http.StatusInternalServerError, "internal error")
 }
 
-func LoginUserId(c echo.Context) int64 {
+func LoginUserId(c echo.Context) int {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(*JwtCustomClaims)
 	userId := claims.Id
 
-	return userId
+	return int(userId)
 }

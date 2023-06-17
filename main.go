@@ -8,8 +8,10 @@ import (
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/tamago0224/rest-app-backend/controllers"
-	"github.com/tamago0224/rest-app-backend/repository"
+	"github.com/tamago0224/rest-app-backend/controller"
+	"github.com/tamago0224/rest-app-backend/domain/service"
+	"github.com/tamago0224/rest-app-backend/infra/mariadb"
+	"github.com/tamago0224/rest-app-backend/usecase"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -21,10 +23,17 @@ func main() {
 	}
 	defer db.Close()
 
-	todoRepository := repository.NewTodoMariaDBRepository(db)
-	todoController := controllers.NewTodoController(todoRepository)
-	userRepository := repository.NewUserMariaDBRepository(db)
-	authController := controllers.NewAuthController(userRepository)
+	todoRepository := mariadb.NewTodoMariaDBRepository(db)
+	userRepository := mariadb.NewUserMariaDBRepository(db)
+
+	todoService := service.NewTodoService(userRepository, todoRepository)
+	userService := service.NewUserService(userRepository)
+
+	todoUsecase := usecase.NewTodoUsecase(todoService)
+	userUsecase := usecase.NewUserUsecase(userService)
+
+	todoController := controller.NewTodoController(todoUsecase)
+	authController := controller.NewAuthController(userUsecase)
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -38,7 +47,7 @@ func main() {
 	apiGroup := e.Group("/api/v1")
 	apiGroup.Use(echojwt.WithConfig(echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(controllers.JwtCustomClaims)
+			return new(controller.JwtCustomClaims)
 		},
 		SigningKey:  []byte("secret"),
 		TokenLookup: "cookie:auth_token",

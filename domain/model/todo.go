@@ -1,4 +1,4 @@
-package models
+package model
 
 type Todo struct {
 	Id          int64  `json:"id,omitempty"`

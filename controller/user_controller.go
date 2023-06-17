@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"database/sql"
@@ -6,22 +6,22 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/tamago0224/rest-app-backend/models"
-	"github.com/tamago0224/rest-app-backend/repository"
+	"github.com/tamago0224/rest-app-backend/domain/model"
+	"github.com/tamago0224/rest-app-backend/usecase"
 )
 
 type UserController struct {
-	userRepo repository.UserRepository
+	usecase usecase.IUserUsecase
 }
 
-func NewUserController(userRepo repository.UserRepository) *UserController {
-	return &UserController{userRepo: userRepo}
+func NewUserController(userUsecase usecase.IUserUsecase) *UserController {
+	return &UserController{usecase: userUsecase}
 }
 
 func (uc *UserController) SearchUser(c echo.Context) error {
 	name := c.QueryParam("name")
 
-	user, err := uc.userRepo.SearchUser(name)
+	user, err := uc.usecase.SearchUser(name)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("user %s not found.", name))
@@ -33,13 +33,13 @@ func (uc *UserController) SearchUser(c echo.Context) error {
 }
 
 func (uc *UserController) CreateUser(c echo.Context) error {
-	var user models.User
+	var user model.User
 	err := c.Bind(&user)
 	if err != nil {
 		return InternalServerError(err)
 	}
 
-	createdUser, err := uc.userRepo.CreateUser(user)
+	createdUser, err := uc.usecase.CreateUser(user)
 	if err != nil {
 		return InternalServerError(err)
 	}
