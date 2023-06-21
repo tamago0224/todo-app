@@ -2,6 +2,11 @@ version: "3"
 services:
   app:
     build: ./
+    environment:
+      TODO_DBNAME: "todo"
+      TODO_USERNAME: "todo"
+      TODO_PASSWORD: "hogehoge"
+      TODO_HOSTNAME: "db:3306"
     ports:
       - "8080:8080"
     depends_on:
