@@ -50,7 +50,7 @@ func main() {
 			return new(controller.JwtCustomClaims)
 		},
 		SigningKey:  []byte("secret"),
-		TokenLookup: "cookie:auth_token",
+		TokenLookup: "header:Authorization:Bearer ,cookie:auth_token",
 	}))
 	apiGroup.GET("/todos", todoController.GetTodoList)
 	apiGroup.POST("/todos", todoController.AddTodo)
