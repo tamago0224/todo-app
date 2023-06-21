@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -10,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/tamago0224/rest-app-backend/controller"
 	"github.com/tamago0224/rest-app-backend/domain/service"
+	"github.com/tamago0224/rest-app-backend/infra"
 	"github.com/tamago0224/rest-app-backend/infra/mariadb"
 	"github.com/tamago0224/rest-app-backend/usecase"
 
@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	db, err := openDB()
+	db, err := infra.OpenDB()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -58,18 +58,4 @@ func main() {
 	apiGroup.DELETE("/todos/:id", todoController.DeleteTodo)
 
 	e.Logger.Fatal(e.Start(":8080"))
-}
-
-func openDB() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "todo:hogehoge@tcp(db:3306)/todo")
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-
-	return db, err
 }
