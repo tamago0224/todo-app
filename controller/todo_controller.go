@@ -75,11 +75,11 @@ func (tc *TodoController) DeleteTodo(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	todo, err := tc.usecase.DeleteTodo(model.Todo{Id: int64(todoID), UserId: int64(userID)})
+	_, err = tc.usecase.DeleteTodo(model.Todo{Id: int64(todoID), UserId: int64(userID)})
 	if err != nil {
 		log.Print(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	return c.JSON(http.StatusNoContent, todo)
+	return c.NoContent(http.StatusNoContent)
 }
