@@ -2,6 +2,7 @@ package mariadb
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/tamago0224/rest-app-backend/domain/model"
 	"github.com/tamago0224/rest-app-backend/domain/repository"
@@ -16,7 +17,7 @@ func NewTodoMariaDBRepository(db *sql.DB) repository.TodoRepository {
 }
 
 func (t *TodoMariaDB) GetAllTodo(userId int) ([]model.Todo, error) {
-	rows, err := t.db.Query("SELECT * FROM todos where user_id = ?", userId)
+	rows, err := t.db.Query("SELECT id, user_id, title, description, done, deadline, created FROM todos where user_id = ?", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -27,11 +28,23 @@ func (t *TodoMariaDB) GetAllTodo(userId int) ([]model.Todo, error) {
 		var userId int64
 		var title string
 		var description string
-		err = rows.Scan(&id, &userId, &title, &description)
+		var done bool
+		var deadline *time.Time
+		var created time.Time
+		err = rows.Scan(&id, &userId, &title, &description, &done, &deadline, &created)
 		if err != nil {
 			return nil, err
 		}
-		todos = append(todos, model.Todo{Id: id, UserId: userId, Title: title, Description: description})
+		todos = append(todos,
+			model.Todo{
+				Id:          id,
+				UserId:      userId,
+				Title:       title,
+				Description: description,
+				Done:        done,
+				Deadline:    deadline,
+				Created:     created,
+			})
 	}
 
 	return todos, nil
@@ -42,16 +55,28 @@ func (t *TodoMariaDB) GetTodo(userID, todoID int) (model.Todo, error) {
 	var userId int64
 	var title string
 	var description string
-	err := t.db.QueryRow("SELECT * FROM todos WHERE id = ? AND user_id = ?", todoID, userID).Scan(&id, &userId, &title, &description)
+	var done bool
+	var deadline *time.Time
+	var created time.Time
+	err := t.db.QueryRow("SELECT id, user_id, title, description, done, deadline, created FROM todos WHERE id = ? AND user_id = ?", todoID, userID).
+		Scan(&id, &userId, &title, &description, &done, &deadline, &created)
 	if err != nil {
 		return model.Todo{}, err
 	}
 
-	return model.Todo{Id: id, Title: title, Description: description}, nil
+	return model.Todo{
+		Id:          id,
+		Title:       title,
+		Description: description,
+		Done:        done,
+		Deadline:    deadline,
+		Created:     created,
+	}, nil
 }
 
 func (t *TodoMariaDB) AddTodo(todo model.Todo) (model.Todo, error) {
-	result, err := t.db.Exec("INSERT INTO todos (title, user_id, description) VALUES (?, ?, ?)", todo.Title, todo.UserId, todo.Description)
+	result, err := t.db.Exec("INSERT INTO todos (user_id, title, description, done, deadline) VALUES (?, ?, ?, ?, ?)",
+		todo.UserId, todo.Title, todo.Description, todo.Done, todo.Deadline)
 	if err != nil {
 		return model.Todo{}, err
 	}
