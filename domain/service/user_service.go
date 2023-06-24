@@ -17,6 +17,7 @@ var (
 type IUserService interface {
 	FindByName(name string) (model.User, error)
 	CreateUser(user model.User) (model.User, error)
+	FindBynameOrCreate(name string) (model.User, error)
 }
 
 type userService struct {
@@ -43,6 +44,28 @@ func (u *userService) FindByName(name string) (model.User, error) {
 
 func (u *userService) CreateUser(user model.User) (model.User, error) {
 	user, err := u.userRepo.CreateUser(user)
+	if err != nil {
+		var mysqlError *mysql.MySQLError
+		if errors.As(err, &mysqlError); mysqlError.Number == 1062 {
+			return model.User{}, ErrUserAlreadyExist
+		}
+		return model.User{}, err
+	}
+
+	return user, nil
+}
+
+func (u *userService) FindBynameOrCreate(name string) (model.User, error) {
+	user, err := u.userRepo.SelectByName(name)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return model.User{}, err
+		}
+	} else {
+		return user, nil
+	}
+
+	user, err = u.userRepo.CreateUser(model.User{Name: name})
 	if err != nil {
 		var mysqlError *mysql.MySQLError
 		if errors.As(err, &mysqlError); mysqlError.Number == 1062 {

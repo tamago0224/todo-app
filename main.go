@@ -32,8 +32,13 @@ func main() {
 	todoUsecase := usecase.NewTodoUsecase(todoService)
 	userUsecase := usecase.NewUserUsecase(userService)
 
+	// oidc設定
+	config, err := controller.NewOAuthConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
 	todoController := controller.NewTodoController(todoUsecase)
-	authController := controller.NewAuthController(userUsecase)
+	authController := controller.NewAuthController(userUsecase, config)
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -42,8 +47,8 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	e.POST("/login", authController.Login)
-	e.POST("/register", authController.RegistUser)
+	e.GET("/login", authController.Login)
+	e.GET("/callback", authController.Callback)
 	apiGroup := e.Group("/api/v1")
 	apiGroup.Use(echojwt.WithConfig(echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
