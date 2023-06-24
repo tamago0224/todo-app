@@ -1,8 +1,12 @@
 package controller
 
 import (
+	"crypto/rand"
+	"encoding/base64"
+	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -19,4 +23,24 @@ func LoginUserId(c echo.Context) int {
 	userId := claims.Id
 
 	return int(userId)
+}
+
+func randString(n int) (string, error) {
+	b := make([]byte, n)
+	if _, err := io.ReadFull(rand.Reader, b); err != nil {
+		return "", err
+	}
+	return base64.RawURLEncoding.EncodeToString(b), nil
+}
+
+func setCallbackCookie(c echo.Context, name, value string) {
+	cookie := &http.Cookie{
+		Name:     name,
+		Value:    value,
+		MaxAge:   int(time.Hour.Seconds()),
+		Secure:   c.IsTLS(),
+		HttpOnly: true,
+	}
+
+	c.SetCookie(cookie)
 }
