@@ -1,8 +1,15 @@
 package service
 
 import (
+	"database/sql"
+	"errors"
+
 	"github.com/tamago0224/rest-app-backend/domain/model"
 	"github.com/tamago0224/rest-app-backend/domain/repository"
+)
+
+var (
+	ErrTodoNotFound = errors.New("todo not found")
 )
 
 type ITodoService interface {
@@ -27,6 +34,9 @@ func NewTodoService(userRepo repository.UserRepository, todoRepo repository.Todo
 func (tc *todoService) FindAllTodo(userID int) ([]model.Todo, error) {
 	_, err := tc.userRepo.SelectByID(userID)
 	if err != nil {
+		if errors.Is(err, ErrUserNotFound) {
+			return []model.Todo{}, ErrUserNotFound
+		}
 		return []model.Todo{}, err
 	}
 
@@ -41,11 +51,17 @@ func (tc *todoService) FindAllTodo(userID int) ([]model.Todo, error) {
 func (tc *todoService) FindByID(userID, todoID int) (model.Todo, error) {
 	_, err := tc.userRepo.SelectByID(userID)
 	if err != nil {
+		if errors.Is(err, ErrUserNotFound) {
+			return model.Todo{}, ErrUserNotFound
+		}
 		return model.Todo{}, err
 	}
 
 	todo, err := tc.todoRepo.GetTodo(userID, todoID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return model.Todo{}, ErrTodoNotFound
+		}
 		return model.Todo{}, err
 	}
 
@@ -55,6 +71,9 @@ func (tc *todoService) FindByID(userID, todoID int) (model.Todo, error) {
 func (tc *todoService) CreateTodo(userID int, todo model.Todo) (model.Todo, error) {
 	_, err := tc.userRepo.SelectByID(userID)
 	if err != nil {
+		if errors.Is(err, ErrUserNotFound) {
+			return model.Todo{}, ErrUserNotFound
+		}
 		return model.Todo{}, err
 	}
 
@@ -70,6 +89,9 @@ func (tc *todoService) CreateTodo(userID int, todo model.Todo) (model.Todo, erro
 func (tc *todoService) DeleteTodo(userID int, todo model.Todo) (model.Todo, error) {
 	_, err := tc.userRepo.SelectByID(userID)
 	if err != nil {
+		if errors.Is(err, ErrUserNotFound) {
+			return model.Todo{}, ErrUserNotFound
+		}
 		return model.Todo{}, err
 	}
 

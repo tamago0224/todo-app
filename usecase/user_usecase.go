@@ -21,7 +21,6 @@ func NewUserUsecase(svc service.IUserService) IUserUsecase {
 func (u *userUsecase) SearchUser(name string) (model.User, error) {
 	user, err := u.svc.FindByName(name)
 	if err != nil {
-		// TODO: ここでAPIエラーレスポンスを組み立てる
 		return model.User{}, err
 	}
 
@@ -31,9 +30,7 @@ func (u *userUsecase) SearchUser(name string) (model.User, error) {
 func (u *userUsecase) CreateUser(user model.User) (model.User, error) {
 	user, err := u.svc.CreateUser(user)
 	if err != nil {
-		// TODO: ここでAPIエラーレスポンスを組み立てる
 		return model.User{}, err
-
 	}
 
 	return user, nil
