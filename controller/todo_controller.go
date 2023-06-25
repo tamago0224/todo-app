@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -8,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/tamago0224/rest-app-backend/domain/model"
+	"github.com/tamago0224/rest-app-backend/domain/service"
 	"github.com/tamago0224/rest-app-backend/usecase"
 )
 
@@ -24,7 +26,14 @@ func (tc *TodoController) GetTodoList(c echo.Context) error {
 	todos, err := tc.usecase.GetTodoList(userID)
 	if err != nil {
 		log.Print(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
+
+		var apiError APIError
+		if errors.Is(err, service.ErrUserNotFound) {
+			apiError = APIError{Code: http.StatusForbidden, Message: http.StatusText(http.StatusForbidden)}
+		} else {
+			apiError = APIError{Code: http.StatusInternalServerError, Message: http.StatusText(http.StatusInternalServerError)}
+		}
+		return c.JSON(apiError.Code, apiError)
 	}
 
 	return c.JSON(http.StatusOK, todos)
@@ -35,14 +44,23 @@ func (tc *TodoController) GetTodo(c echo.Context) error {
 	id := c.Param("id")
 	todoID, err := strconv.Atoi(id)
 	if err != nil {
-		log.Print(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
+		return APIError{Code: http.StatusBadRequest, Message: "invalid id format"}
 	}
 
 	todo, err := tc.usecase.GetTodo(userID, todoID)
 	if err != nil {
 		log.Print(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
+
+		var apiError APIError
+		if errors.Is(err, service.ErrUserNotFound) {
+			apiError = APIError{Code: http.StatusForbidden, Message: http.StatusText(http.StatusForbidden)}
+		} else if errors.Is(err, service.ErrTodoNotFound) {
+			apiError = APIError{Code: http.StatusNotFound, Message: http.StatusText(http.StatusNotFound)}
+		} else {
+			apiError = APIError{Code: http.StatusInternalServerError, Message: http.StatusText(http.StatusInternalServerError)}
+		}
+
+		return c.JSON(apiError.Code, apiError)
 	}
 
 	return c.JSON(http.StatusOK, todo)
@@ -54,13 +72,20 @@ func (tc *TodoController) AddTodo(c echo.Context) error {
 
 	err := c.Bind(&todo)
 	if err != nil {
-		return c.String(http.StatusBadRequest, "invalid todo body")
+		return APIError{Code: http.StatusBadRequest, Message: "invalid todo body"}
 	}
 	todo.UserId = int64(userID)
 	addTodo, err := tc.usecase.AddTodo(todo)
 	if err != nil {
 		log.Print(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
+
+		var apiError APIError
+		if errors.Is(err, service.ErrUserNotFound) {
+			apiError = APIError{Code: http.StatusForbidden, Message: http.StatusText(http.StatusForbidden)}
+		} else {
+			apiError = APIError{Code: http.StatusInternalServerError, Message: http.StatusText(http.StatusInternalServerError)}
+		}
+		return c.JSON(apiError.Code, apiError)
 	}
 
 	return c.JSON(http.StatusCreated, addTodo)
@@ -71,14 +96,21 @@ func (tc *TodoController) DeleteTodo(c echo.Context) error {
 	id := c.Param("id")
 	todoID, err := strconv.Atoi(id)
 	if err != nil {
-		log.Print(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
+		apiError := APIError{Code: http.StatusBadRequest, Message: "invalid id format"}
+		return c.JSON(apiError.Code, apiError)
 	}
 
 	_, err = tc.usecase.DeleteTodo(model.Todo{Id: int64(todoID), UserId: int64(userID)})
 	if err != nil {
 		log.Print(err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
+
+		var apiError APIError
+		if errors.Is(err, service.ErrUserNotFound) {
+			apiError = APIError{Code: http.StatusForbidden, Message: http.StatusText(http.StatusForbidden)}
+		} else {
+			apiError = APIError{Code: http.StatusInternalServerError, Message: http.StatusText(http.StatusInternalServerError)}
+		}
+		return c.JSON(apiError.Code, apiError)
 	}
 
 	return c.NoContent(http.StatusNoContent)

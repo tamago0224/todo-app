@@ -21,6 +21,7 @@ func (t *TodoMariaDB) GetAllTodo(userId int) ([]model.Todo, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	todos := []model.Todo{}
 	for rows.Next() {
@@ -101,17 +102,8 @@ func (t *TodoMariaDB) AddTodo(todo model.Todo) (model.Todo, error) {
 }
 
 func (t *TodoMariaDB) DeleteTodo(todo model.Todo) (model.Todo, error) {
-	result, err := t.db.Exec("DELETE FROM todos WHERE id = ? AND user_id = ?", todo.Id, todo.UserId)
+	_, err := t.db.Exec("DELETE FROM todos WHERE id = ? AND user_id = ?", todo.Id, todo.UserId)
 	if err != nil {
-		return model.Todo{}, err
-	}
-
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return model.Todo{}, err
-	}
-
-	if rows != 1 {
 		return model.Todo{}, err
 	}
 

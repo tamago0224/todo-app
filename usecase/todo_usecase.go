@@ -23,7 +23,6 @@ func NewTodoUsecase(svc service.ITodoService) ITodoUsecase {
 func (t *todoUsecase) GetTodoList(userID int) ([]model.Todo, error) {
 	todos, err := t.svc.FindAllTodo(userID)
 	if err != nil {
-		// TODO: API用のエラーはここで組み立てる
 		return []model.Todo{}, err
 	}
 
@@ -33,7 +32,6 @@ func (t *todoUsecase) GetTodoList(userID int) ([]model.Todo, error) {
 func (t *todoUsecase) GetTodo(userID, todoID int) (model.Todo, error) {
 	todo, err := t.svc.FindByID(userID, todoID)
 	if err != nil {
-		// TODO: API用のエラーはここで組み立てる
 		return model.Todo{}, err
 	}
 
@@ -43,7 +41,6 @@ func (t *todoUsecase) GetTodo(userID, todoID int) (model.Todo, error) {
 func (t *todoUsecase) AddTodo(todo model.Todo) (model.Todo, error) {
 	todo, err := t.svc.CreateTodo(int(todo.UserId), todo)
 	if err != nil {
-		// TODO: API用のエラーはここで組み立てる
 		return model.Todo{}, err
 	}
 
@@ -53,7 +50,6 @@ func (t *todoUsecase) AddTodo(todo model.Todo) (model.Todo, error) {
 func (t *todoUsecase) DeleteTodo(todo model.Todo) (model.Todo, error) {
 	todo, err := t.svc.DeleteTodo(int(todo.UserId), todo)
 	if err != nil {
-		// TODO: API用のエラーはここで組み立てる
 		return model.Todo{}, err
 	}
 
