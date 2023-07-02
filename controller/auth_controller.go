@@ -140,9 +140,12 @@ func (ac *AuthController) Callback(c echo.Context) error {
 	}
 
 	// ユーザ情報を元にJWTを作成しユーザに返却する
-	jwtClaims := jwt.MapClaims{
-		"user_id": user.Id,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+	jwtClaims := JwtCustomClaims{
+		Name: user.Name,
+		Id:   user.Id,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+		},
 	}
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaims)
 	tokenString, err := jwtToken.SignedString([]byte(signingKey))
